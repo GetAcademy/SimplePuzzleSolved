@@ -9,21 +9,78 @@
 </head>
 
 <body>
-    <div style="display: grid; grid-template-columns: 32em auto; grid-template-rows: auto 8em; height: 95vh; grid-template-areas: 'board text' ' buttons buttons'">
+    <div
+        style="display: grid; grid-template-columns: 32em auto; grid-template-rows: auto 8em; height: 95vh; grid-template-areas: 'board text' ' buttons buttons'">
         <div id="board" style="grid-area: board;"></div>
         <div id="exerciseText" style="overflow-y: scroll;height: 32em;grid-area: text;"></div>
         <div id="buttons" style="background-color: lightblue;grid-area: buttons;"></div>
     </div>
     <script>
-        addPuzzlePiece('board', false, false, true, true, '', 1, 24, 0);
-        addPuzzlePiece('board', false, true, true, true, '', 2, 18, 0);
-        addPuzzlePiece('board', false, true, true, true, '', 1, 12, 0);
-        addPuzzlePiece('board', true, false, true, true, '', 2, 24, 6);
+        let currentLeftPosition = 24;
+        let currentTopPosition = 0;
+        let color = 1;
 
         addPuzzlePiece('buttons', true, true, true, true, 'addNormalPuzzlePieceToBoard()', 1);
         addPuzzlePiece('buttons', false, true, true, true, 'addPuzzlePieceWithoutTopToBoard()', 2);
+        addPuzzlePiece('buttons', true, false, true, true, 'addPuzzlePieceWithoutRightToBoard()', 2);
         addPuzzlePiece('buttons', false, false, true, true, 'addPuzzlePieceWithoutRightAndTopToBoard()', 1);
-        function addPuzzlePiece(toId, hasTop, hasRight, hasBottom, hasLeft, onclick, color, leftPosition, topPosition) {
+        addPuzzlePiece('buttons', false, true, true, false, 'addPuzzlePieceWithoutLeftAndTopToBoard()', 1);
+
+        function addPuzzlePieceWithoutTopToBoard() {
+            let addedPiece = addPuzzlePiece('board', false, true, true, true, '', color, currentLeftPosition, currentTopPosition);
+            if(addedPiece) {
+                updatePositionAndColor();
+            }
+        }
+
+        function addPuzzlePieceWithoutRightToBoard() {
+            let addedPiece = addPuzzlePiece('board', true, false, true, true, '', color, currentLeftPosition, currentTopPosition);
+            if(addedPiece) {
+                updatePositionAndColor();
+            }
+            
+        }
+
+        function addNormalPuzzlePieceToBoard() {
+            let addedPiece = addPuzzlePiece('board', true, true, true, true, '', color, currentLeftPosition, currentTopPosition);
+            if(addedPiece) {
+                updatePositionAndColor();
+            }
+        }
+
+        function addPuzzlePieceWithoutRightAndTopToBoard() {
+            addPuzzlePiece('board', false, false, true, true, '', color, currentLeftPosition, currentTopPosition);
+            if(addedPiece) {
+                updatePositionAndColor();
+            }
+        }
+
+        function addPuzzlePieceWithoutLeftAndTopToBoard() {
+            addPuzzlePiece('board', false, true, true, false, '', color, currentLeftPosition, currentTopPosition);
+            if(addedPiece) {
+                updatePositionAndColor();
+            }
+        }
+
+        function updatePositionAndColor() {
+            color = color == 1 ? 2 : 1;
+            // color = 3 - color;
+            currentLeftPosition -= 6;
+            if (currentLeftPosition < 0) {
+                currentLeftPosition = 24;
+                currentTopPosition += 6;
+            }
+        }
+
+        function addPuzzlePiece(toId,
+            hasTop, hasRight, hasBottom, hasLeft,
+            onclick, color, leftPosition, topPosition) {
+
+            // HVIS vi er på første rad OG topp ikke er slett => stopp
+            if (topPosition == 0 && hasTop){
+                return false;
+            }
+
             let style = '';
             if (leftPosition !== undefined) {
                 style = `left: ${leftPosition + 0.5}em; top: ${topPosition + 0.5}em`;
@@ -37,6 +94,8 @@
                     ${hasLeft ? `<span class="l"></span>` : ''}
                 </div>            
             `;
+
+            return true;
         }
 
         document.getElementById('exerciseText').innerHTML = /*HTML*/`            
